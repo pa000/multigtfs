@@ -118,6 +118,21 @@ class Migration(migrations.Migration):
                 'managed': False,
             },
         ),
+        migrations.RunSQL(
+            """
+            CREATE MATERIALIZED VIEW trip_time AS
+            SELECT trip_id,
+                   MIN(arrival_time) as start_time,
+                   MAX(arrival_time) as end_time
+            FROM stop_time
+            GROUP BY trip_id
+            """,
+            "DROP MATERIALIZED VIEW trip_time",
+        ),
+        migrations.RunSQL(
+            "CREATE UNIQUE INDEX trip_time_trip ON trip_time (trip_id)",
+            "DROP INDEX trip_time_trip",
+        ),
         migrations.AddField(
             model_name='trip',
             name='block',
