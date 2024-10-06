@@ -106,33 +106,6 @@ class Migration(migrations.Migration):
                 'db_table': 'shape',
             },
         ),
-        migrations.CreateModel(
-            name='TripTime',
-            fields=[
-                ('trip', models.OneToOneField(on_delete=django.db.models.deletion.DO_NOTHING, primary_key=True, serialize=False, to='multigtfs.trip')),
-                ('start_time', multigtfs.models.fields.seconds.SecondsField()),
-                ('end_time', multigtfs.models.fields.seconds.SecondsField()),
-            ],
-            options={
-                'db_table': 'trip_time',
-                'managed': False,
-            },
-        ),
-        migrations.RunSQL(
-            """
-            CREATE MATERIALIZED VIEW trip_time AS
-            SELECT trip_id,
-                   MIN(arrival_time) as start_time,
-                   MAX(arrival_time) as end_time
-            FROM stop_time
-            GROUP BY trip_id
-            """,
-            "DROP MATERIALIZED VIEW trip_time",
-        ),
-        migrations.RunSQL(
-            "CREATE UNIQUE INDEX trip_time_trip ON trip_time (trip_id)",
-            "DROP INDEX trip_time_trip",
-        ),
         migrations.AddField(
             model_name='trip',
             name='block',
@@ -315,6 +288,33 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'stop_time',
             },
+        ),
+        migrations.CreateModel(
+            name='TripTime',
+            fields=[
+                ('trip', models.OneToOneField(on_delete=django.db.models.deletion.DO_NOTHING, primary_key=True, serialize=False, to='multigtfs.trip')),
+                ('start_time', multigtfs.models.fields.seconds.SecondsField()),
+                ('end_time', multigtfs.models.fields.seconds.SecondsField()),
+            ],
+            options={
+                'db_table': 'trip_time',
+                'managed': False,
+            },
+        ),
+        migrations.RunSQL(
+            """
+            CREATE MATERIALIZED VIEW trip_time AS
+            SELECT trip_id,
+                   MIN(arrival_time) as start_time,
+                   MAX(arrival_time) as end_time
+            FROM stop_time
+            GROUP BY trip_id
+            """,
+            "DROP MATERIALIZED VIEW trip_time",
+        ),
+        migrations.RunSQL(
+            "CREATE UNIQUE INDEX trip_time_trip ON trip_time (trip_id)",
+            "DROP INDEX trip_time_trip",
         ),
         migrations.CreateModel(
             name='Transfer',
